@@ -50,6 +50,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private var input: Int? = null
+    private var previousInput: Int? = null
+    private var symbol: String? = null
 
     private fun onCellClicked(value: String) {
         when {
@@ -57,14 +59,42 @@ class MainActivity : AppCompatActivity() {
                 input = value.toInt()
                 updateDisplayContainer(value)
             }
+            value == "=" -> onEqualsClicked()
+            listOf("/", "*", "-", "+").contains(value) -> onSymbolClicked(value)
         }
+    }
+
+    private fun onSymbolClicked(symbol: String) {
+        this.symbol = symbol
+        previousInput = input
+        input = null
     }
 
     private fun updateDisplayContainer(value: Any) {
         findViewById<TextView>(R.id.calculator_display_container).text = value.toString()
     }
 
-    fun String.isNum(): Boolean {
-        return length == 1 && isDigitsOnly()
+    private fun onEqualsClicked() {
+        if (input == null || previousInput == null || symbol == null) {
+            return
+        }
+
+        updateDisplayContainer(when (symbol) {
+            "+" -> input!! + previousInput!!
+            "-" -> input!! - previousInput!!
+            "*" -> input!! * previousInput!!
+            "/" -> input!! / previousInput!!
+            else -> "ERROR"
+        })
+
+        input = null
+        previousInput = null
+        symbol = null
     }
+
+
+}
+
+fun String.isNum(): Boolean {
+    return length == 1 && isDigitsOnly()
 }
